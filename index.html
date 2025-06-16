@@ -1,1 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solución de Desigualdades Lineales y Cuadráticas</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7fa; max-width: 600px; margin: 40px auto; border-radius: 16px; padding: 32px; box-shadow: 0 2px 16px #ddd; }
+        h2 { color: #2e2145; }
+        input, select, button { font-size: 1rem; padding: 5px; margin: 3px; border-radius: 8px; border: 1px solid #bbb;}
+        button { background: #592135; color: #fff; border: none; }
+        .resultado { margin-top: 24px; font-size: 1.1rem; }
+        .form-group { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Solución de Desigualdades Lineales y Cuadráticas</h2>
+    <form id="form">
+        <div class="form-group">
+            <label>Tipo de desigualdad:</label>
+            <select id="tipo" required>
+                <option value="lineal">Lineal (ax + b &lt;, &gt;, ≤, ≥ 0)</option>
+                <option value="cuadratica">Cuadrática (ax² + bx + c &lt;, &gt;, ≤, ≥ 0)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>a: </label><input type="number" id="a" required step="any">
+            <label>b: </label><input type="number" id="b" required step="any">
+            <span id="c_group" style="display:none;">
+                <label>c: </label><input type="number" id="c" step="any">
+            </span>
+        </div>
+        <div class="form-group">
+            <label>Desigualdad:</label>
+            <select id="desig" required>
+                <option value="<">&lt; 0</option>
+                <option value=">">&gt; 0</option>
+                <option value="<=">&le; 0</option>
+                <option value=">=">&ge; 0</option>
+            </select>
+        </div>
+        <button type="submit">Resolver</button>
+    </form>
+    <div class="resultado" id="resultado"></div>
+
+    <script>
+        const tipo = document.getElementById('tipo');
+        const c_group = document.getElementById('c_group');
+        tipo.addEventListener('change', function() {
+            c_group.style.display = this.value === 'cuadratica' ? 'inline' : 'none';
+        });
+
+        document.getElementById('form').onsubmit = function(e) {
+            e.preventDefault();
+            const a = parseFloat(document.getElementById('a').value);
+            const b = parseFloat(document.getElementById('b').value);
+            const c = tipo.value === 'cuadratica' ? parseFloat(document.getElementById('c').value) : 0;
+            const desigualdad = document.getElementById('desig').value;
+            let res = "";
+
+            if (tipo.value === 'lineal') {
+                // ax + b op 0
+                if (a === 0) {
+                    if (
+                        (desigualdad === "<" && b < 0) ||
+                        (desigualdad === "<=" && b <= 0) ||
+                        (desigualdad === ">" && b > 0) ||
+                        (desigualdad === ">=" && b >= 0)
+                    ) {
+                        res = "La desigualdad se cumple para todo x ∈ ℝ.";
+                    } else {
+                        res = "La desigualdad no tiene solución.";
+                    }
+                } else {
+                    let signo = (a > 0) ? 1 : -1;
+                    let valor = -b / a;
+                    let simbolo = desigualdad;
+                    let intervalo = "";
+
+                    if (signo === 1) {
+                        if (simbolo === "<") intervalo = `x &lt; ${valor}`;
+                        if (simbolo === "<=") intervalo = `x ≤ ${valor}`;
+                        if (simbolo === ">") intervalo = `x &gt; ${valor}`;
+                        if (simbolo === ">=") intervalo = `x ≥ ${valor}`;
+                    } else {
+                        if (simbolo === "<") intervalo = `x &gt; ${valor}`;
+                        if (simbolo === "<=") intervalo = `x ≥ ${valor}`;
+                        if (simbolo === ">") intervalo = `x &lt; ${valor}`;
+                        if (simbolo === ">=") intervalo = `x ≤ ${valor}`;
+                    }
+                    res = "Solución: " + intervalo;
+                }
+            } else {
+                // ax^2 + bx + c op 0
+                if (a === 0) {
+                    // Se vuelve lineal
+                    if (b === 0) {
+                        if (
+                            (desigualdad === "<" && c < 0) ||
+                            (desigualdad === "<=" && c <= 0) ||
+                            (desigualdad === ">" && c > 0) ||
+                            (desigualdad === ">=" && c >= 0)
+                        ) {
+                            res = "La desigualdad se cumple para todo x ∈ ℝ.";
+                        } else {
+                            res = "La desigualdad no tiene solución.";
+                        }
+                    } else {
+                        let signo = (b > 0) ? 1 : -1;
+                        let valor = -c / b;
+                        let simbolo = desigualdad;
+                        let intervalo = "";
+
+                        if (signo === 1) {
+                            if (simbolo === "<") intervalo = `x &lt; ${valor}`;
+                            if (simbolo === "<=") intervalo = `x ≤ ${valor}`;
+                            if (simbolo === ">") intervalo = `x &gt; ${valor}`;
+                            if (simbolo === ">=") intervalo = `x ≥ ${valor}`;
+                        } else {
+                            if (simbolo === "<") intervalo = `x &gt; ${valor}`;
+                            if (simbolo === "<=") intervalo = `x ≥ ${valor}`;
+                            if (simbolo === ">") intervalo = `x &lt; ${valor}`;
+                            if (simbolo === ">=") intervalo = `x ≤ ${valor}`;
+                        }
+                        res = "Solución (caso lineal): " + intervalo;
+                    }
+                } else {
+                    // Cuadrática
+                    const D = b * b - 4 * a * c;
+                    let x1, x2;
+                    if (D > 0) {
+                        x1 = (-b + Math.sqrt(D)) / (2 * a);
+                        x2 = (-b - Math.sqrt(D)) / (2 * a);
+                        if (x1 > x2) [x1, x2] = [x2, x1];
+                        if (a > 0) {
+                            if (desigualdad === "<") res = `Solución: ${x1.toFixed(4)} &lt; x &lt; ${x2.toFixed(4)}`;
+                            if (desigualdad === "<=") res = `Solución: ${x1.toFixed(4)} ≤ x ≤ ${x2.toFixed(4)}`;
+                            if (desigualdad === ">") res = `Solución: x &lt; ${x1.toFixed(4)} o x &gt; ${x2.toFixed(4)}`;
+                            if (desigualdad === ">=") res = `Solución: x ≤ ${x1.toFixed(4)} o x ≥ ${x2.toFixed(4)}`;
+                        } else {
+                            if (desigualdad === "<") res = `Solución: x &lt; ${x1.toFixed(4)} o x &gt; ${x2.toFixed(4)}`;
+                            if (desigualdad === "<=") res = `Solución: x ≤ ${x1.toFixed(4)} o x ≥ ${x2.toFixed(4)}`;
+                            if (desigualdad === ">") res = `Solución: ${x1.toFixed(4)} &lt; x &lt; ${x2.toFixed(4)}`;
+                            if (desigualdad === ">=") res = `Solución: ${x1.toFixed(4)} ≤ x ≤ ${x2.toFixed(4)}`;
+                        }
+                    } else if (D === 0) {
+                        x1 = -b / (2 * a);
+                        if (a > 0) {
+                            if (desigualdad === "<" || desigualdad === ">") res = "No hay solución real.";
+                            if (desigualdad === "<=" || desigualdad === ">=") res = `Solución: x = ${x1.toFixed(4)}`;
+                        } else {
+                            if (desigualdad === "<" || desigualdad === ">") res = "No hay solución real.";
+                            if (desigualdad === "<=" || desigualdad === ">=") res = `Solución: x = ${x1.toFixed(4)}`;
+                        }
+                    } else { // D < 0
+                        if ((a > 0 && (desigualdad === "<" || desigualdad === "<=")) ||
+                            (a < 0 && (desigualdad === ">" || desigualdad === ">="))) {
+                            res = "La desigualdad se cumple para todo x ∈ ℝ.";
+                        } else {
+                            res = "No hay solución real.";
+                        }
+                    }
+                }
+            }
+
+            document.getElementById('resultado').innerHTML = res;
+        };
+    </script>
+</body>
+</html>
 
